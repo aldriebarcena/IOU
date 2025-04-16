@@ -1,74 +1,66 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const dummyGroups = [
+  { id: '1', name: 'Roommates', status: 'Pending split' },
+  { id: '2', name: 'Birthday Dinner', status: 'All paid' },
+];
 
-export default function HomeScreen() {
+export default function HomeTab() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.subtitle}>Here are your active groups:</Text>
+
+      <FlatList
+        data={dummyGroups}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.groupCard}>
+            <Text style={styles.groupName}>{item.name}</Text>
+            <Text style={styles.groupStatus}>{item.status}</Text>
+          </View>
+        )}
+        ListEmptyComponent={<Text style={styles.empty}>No groups yet</Text>}
+        contentContainerStyle={{ paddingTop: 10 }}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: '#fff',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  subtitle: {
+    fontSize: 16,
+    color: '#555',
+    marginTop: 8,
+  },
+  groupCard: {
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 10,
+    backgroundColor: '#f2f2f2',
+  },
+  groupName: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  groupStatus: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  empty: {
+    marginTop: 32,
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
   },
 });
