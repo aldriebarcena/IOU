@@ -19,7 +19,6 @@ const styles = StyleSheet.create({
     paddingVertical: 25, // smaller = skinnier height
     borderRadius: 25,
     alignItems: "center",
-    marginHorizontal: 50,
   },
   text: {
     color: "#fff",
