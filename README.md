@@ -1,71 +1,57 @@
-# IOU - Receipt Splitting app
+# IOU - Receipt Splitting App
 
-**IOU** is a mobile application that makes splitting receipts simple, transparent, and fair. Designed for roommates, friends, or anyone sharing expenses, it allows one person (the main payer) to upload a receipt and invite others to select their items or opt for an even split. The app handles tax distribution, shared item logic, and payment tracking with daily reminders.
+**IOU** is a lightweight web application that simplifies the process of splitting receipts between friends or roommates. One person (the main payer) uploads a receipt, configures the split, and shares a unique link with others (co-payers) who select their items or accept an even split. The app handles tax logic, shared item tracking, and sends SMS reminders and confirmations using AWS services.
 
 ---
 
 ## Features
 
-### Account Creation
-- Sign up and log in with phone number and password
-
 ### Receipt Uploading
-- Upload receipts manually or by taking a photo
-- OCR parsing via AWS Textract to extract item data
-- Users can edit the parsed receipt before confirming
+- Upload receipts manually or with a photo
+- OCR parsing via AWS Textract to extract items
+- Editable item list before confirmation
 
 ### Split Options
-- Even split option (simple toggle)
-- Manual split: co-payers select items, including shared items
-- Tax split options: evenly, proportionally, or not at all
-- Main payer must assign their own portion if split is manual
+- Even split toggle
+- Manual split: co-payers select items (supporting shared items)
+- Tax options: evenly, proportionally, or none
+- Main payer assigns their own portion if not evenly split
 
 ### Main Payer Workflow
 - Upload and confirm receipt
-- Choose tax and split settings
-- Select preferred payment method (e.g., Venmo handle)
-- Invite users via group or link
-- Lock receipt after all item selections are complete
-- Confirm payment from each co-payer
-- Manual override of item splits if needed
-- View and manage receipt archive
+- Choose split method and tax handling
+- Enter preferred payment method (e.g., Venmo handle)
+- Share receipt link with co-payers (no login or group required)
+- View submissions and mark co-payers as paid
+- Archive past receipts (optional)
 
 ### Co-Payer Workflow
-- Join via invite link or in-app group notification
-- Select items or view even split
-- View final total and main payer’s payment method
-- Confirm payment after sending
+- Visit shared receipt link
+- Input name and phone number
+- Select items (or view even split)
+- Submit selection and receive total via SMS
+- Confirm payment through a second unique link
 - Removed from reminder list upon confirmation
 
 ### Notifications
-- Notifications when invited, when receipt is locked, and when payment is confirmed
-- Daily reminders for unpaid users (AWS SNS or Lambda-based)
-
-### Group Management
-- Create persistent groups for recurring use
-- Invite group members to new receipts without sending a link
-- View active and past groups
-- Leave or delete groups as needed
-
-### Receipt History
-- Full archive of past receipts and payment statuses
-- Filter receipts by group or date
-- Duplicate past receipts for reuse
+- SMS sent via AWS SNS when:
+  - A user is invited to a receipt
+  - Their split is calculated
+  - Payment is confirmed
+- Daily reminders sent to unpaid co-payers (via AWS Lambda)
 
 ---
 
 ## Tech Stack
 
-**Frontend**
-- React Native (via Expo or CLI)
-- Redux Toolkit or Zustand for state management
-- React Navigation for routing
-- react-native-image-picker for receipt photos
+### Frontend
+- Next.js (App Router)
+- TailwindCSS
+- TypeScript
 
-**Backend (AWS)**
-- AWS Cognito for authentication
-- AWS S3 for image storage
-- AWS Textract for OCR parsing
-- AWS Lambda + API Gateway for backend logic
-- AWS DynamoDB for database
-- AWS SNS for notifications (or Firebase Cloud Messaging as fallback)
+### AWS Services
+- **S3** – Receipt image uploads
+- **Textract** – OCR receipt parsing
+- **DynamoDB** – Store receipt, item, and co-payer data
+- **SNS** – SMS notifications
+- **Lambda** – Scheduled reminders and backend logic (as needed)
