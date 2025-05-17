@@ -1,4 +1,4 @@
-# IOU - Receipt Splitting App
+# IOU - Receipt Splitting Service
 
 **IOU** is a lightweight web application that simplifies the process of splitting receipts between friends or roommates. One person (the main payer) uploads a receipt, configures the split, and shares a unique link with others (co-payers) who select their items or accept an even split. The app handles tax logic, shared item tracking, and sends SMS reminders and confirmations using AWS services.
 
