@@ -21,8 +21,7 @@ export default function Home() {
   };
 
   const handleManualEntry = () => {
-    const receiptId = "sample-id";
-    router.push(`/receipt/${receiptId}`);
+    router.push(`/create/`);
     setShowOptions(false);
   };
 

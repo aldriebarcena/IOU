@@ -1,0 +1,1 @@
+// main payer view after receipt is confirmed
