@@ -12,14 +12,12 @@
 - Editable item list before confirmation
 
 ### Split Options
-- Even split toggle
 - Manual split: co-payers select items (supporting shared items)
 - Tax options: evenly, proportionally, or none
-- Main payer assigns their own portion if not evenly split
 
 ### Main Payer Workflow
 - Upload and confirm receipt
-- Choose split method and tax handling
+- Choose tax handling split method
 - Enter preferred payment method (e.g., Venmo handle)
 - Share receipt link with co-payers (no login or group required)
 - View submissions and mark co-payers as paid
@@ -28,8 +26,8 @@
 ### Co-Payer Workflow
 - Visit shared receipt link
 - Input name and phone number
-- Select items (or view even split)
-- Submit selection and receive total via SMS
+- Select items
+- Submit selection and receive total via SMS when all users have selected
 - Confirm payment through a second unique link
 - Removed from reminder list upon confirmation
 
