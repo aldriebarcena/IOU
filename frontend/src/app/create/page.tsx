@@ -51,7 +51,8 @@ export default function Create() {
     setNewItem({ name: "", price: 0 });
   };
 
-  const handleCreateReceipt = () => {
+  const handleChooseItems = () => {
+    console.log("Receipt ready for item selection.")
     console.log("Receipt Created: ", receiptName);
     console.log("Items: ", items);
     console.log("Tax Split Option: ", taxSplitOption);
@@ -121,10 +122,10 @@ export default function Create() {
             Set Tax Split
           </button>
           <button
-            onClick={handleCreateReceipt}
+            onClick={handleChooseItems}
             className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold"
           >
-            Create Receipt
+            Choose Items
           </button>
         </div>
       </div>

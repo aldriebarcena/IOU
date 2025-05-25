@@ -15,13 +15,13 @@ export default function Admin() {
     {
       name: "Item 1",
       price: 10,
-      selectedBy: ["John", "Jane"],
+      selectedBy: ["John", "Jane", "You"],
       confirmedBy: [],
     },
     {
       name: "Item 2",
       price: 15,
-      selectedBy: ["Alice"],
+      selectedBy: ["Alice", "You"],
       confirmedBy: [],
     },
     {
@@ -32,7 +32,8 @@ export default function Admin() {
     },
   ]);
 
-  const [people] = useState(["John", "Jane", "Alice", "Bob"]);
+  const [people] = useState(["John", "Jane", "Alice", "Bob", "You"]);
+  const mainPayer = "You"; // Set the main payer's name
 
   const handleConfirm = (person: string) => {
     console.log(person, "confirmed");
@@ -82,7 +83,7 @@ export default function Admin() {
 
         {items.map((item, index) => (
           <div key={index} className="flex mb-4">
-            <div className="w-1/2 px-3 py-2 border rounded-lg">
+            <div className="w-1/2 px-3 py-2">
               <div className="font-semibold">{item.name}</div>
               <div className="mt-2">
                 {item.selectedBy.map((person, i) => (
@@ -98,7 +99,7 @@ export default function Admin() {
                 ))}
               </div>
             </div>
-            <div className="w-1/2 text-right px-3 py-2 border rounded-lg">
+            <div className="w-1/2 text-right px-3 py-2">
               ${item.price.toFixed(2)}
             </div>
           </div>
@@ -112,16 +113,17 @@ export default function Admin() {
               <div key={person} className="flex justify-between mb-2">
                 <div>
                   <span>{person}</span>
-                  {!items.every((item) =>
-                    item.confirmedBy.includes(person)
-                  ) && (
-                    <button
-                      onClick={() => handleConfirm(person)}
-                      className="text-xs text-green-600 ml-2"
-                    >
-                      Confirm
-                    </button>
-                  )}
+                  {person !== mainPayer &&
+                    !items.every((item) =>
+                      item.confirmedBy.includes(person)
+                    ) && (
+                      <button
+                        onClick={() => handleConfirm(person)}
+                        className="text-xs text-green-600 ml-2"
+                      >
+                        Confirm
+                      </button>
+                    )}
                 </div>
 
                 <span>
