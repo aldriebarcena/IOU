@@ -9,7 +9,7 @@ interface Item {
   confirmedBy: string[]; // Make sure confirmedBy is an array of strings
 }
 
-export default function MainPayerView() {
+export default function Admin() {
   // Explicitly define the type for the items state
   const [items, setItems] = useState<Item[]>([
     {

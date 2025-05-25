@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function CoPayerItemSelection() {
+export default function Receipt() {
   // Sample data for items
   const [items, setItems] = useState([
     { name: "Item 1", price: 10, selected: false },
