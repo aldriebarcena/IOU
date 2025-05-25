@@ -1,6 +1,6 @@
 "use client";
-
 import { useState } from "react";
+import Header from "@/components/Header";
 
 export default function MainPayerReceipt() {
   // Sample data for items
@@ -22,7 +22,7 @@ export default function MainPayerReceipt() {
 
   return (
     <div className="flex flex-col items-center justify-center px-8 py-8">
-      <h1 className="text-5xl font-bold mb-4">Main Payer Item Selection</h1>
+      <Header title="Main Payer Item Selection" />
 
       <div className="w-full max-w-lg">
         <div className="flex mb-4">

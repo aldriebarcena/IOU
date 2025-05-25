@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Header from "@/components/Header";
 
 interface Item {
   name: string;
@@ -73,7 +74,7 @@ export default function Admin() {
 
   return (
     <div className="flex flex-col items-center justify-center px-8 py-8">
-      <h1 className="text-5xl font-bold mb-4">Receipt Summary</h1>
+      <Header title="Receipt Summary"/>
 
       <div className="w-full max-w-lg">
         <div className="flex mb-4">

@@ -1,6 +1,6 @@
 "use client";
-
 import { useState } from "react";
+import Header from "@/components/Header";
 
 export default function CoPayerView() {
   // Sample data for items (assuming all items are selected)
@@ -32,7 +32,7 @@ export default function CoPayerView() {
 
   return (
     <div className="flex flex-col items-center justify-center px-8 py-8">
-      <h1 className="text-5xl font-bold mb-4">Co-Payer Receipt Confirmation</h1>
+      <Header title="Co-Payer Receipt Confirmation"/>
 
       <div className="w-full max-w-lg">
         <div className="flex justify-between mb-4 mt-4">

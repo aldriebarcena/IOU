@@ -1,6 +1,6 @@
 "use client";
-
 import { useState } from "react";
+import Header from "@/components/Header";
 
 export default function Submit() {
   const [name, setName] = useState("");
@@ -25,7 +25,7 @@ export default function Submit() {
 
   return (
     <div className="flex flex-col items-center justify-center px-8 py-8">
-      <h1 className="text-5xl font-bold mb-4">Submit Your Information</h1>
+      <Header title="Submit Your Information" />
 
       {!submitted ? (
         <form onSubmit={handleSubmit} className="w-full max-w-lg">

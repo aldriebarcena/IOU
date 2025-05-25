@@ -1,6 +1,6 @@
 "use client";
-
 import { useState } from "react";
+import Header from "@/components/Header";
 
 export default function Create() {
   const [items, setItems] = useState([
@@ -71,7 +71,7 @@ export default function Create() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-8 py-8">
-      <h1 className="text-5xl font-bold mb-4">{receiptName}</h1>
+      <Header title={receiptName}/>
 
       <div className="w-full max-w-lg">
         <div className="flex mb-4">
