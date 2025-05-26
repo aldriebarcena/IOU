@@ -52,7 +52,7 @@ export default function Create() {
   };
 
   const handleChooseItems = () => {
-    console.log("Receipt ready for item selection.")
+    console.log("Receipt ready for item selection.");
     console.log("Receipt Created: ", receiptName);
     console.log("Items: ", items);
     console.log("Tax Split Option: ", taxSplitOption);
@@ -69,9 +69,14 @@ export default function Create() {
     setTaxAmount(tax);
   };
 
+  const handleDeleteItem = (index: number) => {
+    const newItems = items.filter((_, i) => i !== index);
+    setItems(newItems);
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-8 py-8">
-      <Header title={receiptName}/>
+      <Header title={receiptName} />
 
       <div className="w-full max-w-lg">
         <div className="flex mb-4">
@@ -80,7 +85,7 @@ export default function Create() {
         </div>
 
         {items.map((item, index) => (
-          <div key={index} className="flex mb-4">
+          <div key={index} className="flex mb-4 items-center gap-2">
             <input
               type="text"
               value={item.name}
@@ -89,10 +94,16 @@ export default function Create() {
             />
             <input
               type="number"
-              value={item.price || ""} // Ensure price is valid and not NaN
+              value={item.price || ""}
               onChange={(e) => handleChange(index, "price", e.target.value)}
-              className="w-1/2 px-3 py-2 border rounded-lg text-right"
+              className="w-1/3 px-3 py-2 border rounded-lg text-right"
             />
+            <button
+              onClick={() => handleDeleteItem(index)}
+              className="px-3 py-2 bg-red-500 text-white font-semibold rounded-lg"
+            >
+              Delete
+            </button>
           </div>
         ))}
 
