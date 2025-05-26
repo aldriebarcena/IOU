@@ -4,13 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaCloudUploadAlt } from "react-icons/fa";
 
-// Mock function for uploading image to S3 (you can replace this with actual implementation)
-const uploadImageToS3 = (file: File) => {
-  // For now, just log the file
-  console.log("Uploading file to S3:", file);
-  // You can replace this with actual logic to upload the file to S3
-};
-
 export default function Home() {
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false); // Modal state for upload form
@@ -18,6 +11,41 @@ export default function Home() {
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
+
+  const uploadImageToS3 = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        console.log("File uploaded successfully:", responseData);
+        alert("File uploaded successfully!");
+      } else {
+        // Log the error message returned from the backend
+        console.error("Failed to upload file:", responseData);
+        alert(`Failed to upload file: ${responseData.message}`);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("An error occurred while uploading.");
+    }
+  };
+
+  const handleSubmit = () => {
+    if (selectedFile) {
+      uploadImageToS3(selectedFile); // Upload the file to S3 via the backend
+      setShowModal(false); // Close the modal after upload
+    } else {
+      alert("Please select a file to upload.");
+    }
+  };
 
   const handleUploadImage = () => {
     setShowModal(true); // Open the upload modal
@@ -32,16 +60,6 @@ export default function Home() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setSelectedFile(e.target.files[0]);
-    }
-  };
-
-  const handleSubmit = () => {
-    if (selectedFile) {
-      uploadImageToS3(selectedFile);
-      setShowModal(false); // Close the modal after upload
-      alert("File uploaded successfully!");
-    } else {
-      alert("Please select a file to upload.");
     }
   };
 
