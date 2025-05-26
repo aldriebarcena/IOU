@@ -4,25 +4,49 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaCloudUploadAlt } from "react-icons/fa";
 
+// Mock function for uploading image to S3 (you can replace this with actual implementation)
+const uploadImageToS3 = (file: File) => {
+  // For now, just log the file
+  console.log("Uploading file to S3:", file);
+  // You can replace this with actual logic to upload the file to S3
+};
+
 export default function Home() {
   const [showOptions, setShowOptions] = useState(false);
+  const [showModal, setShowModal] = useState(false); // Modal state for upload form
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); // To store the uploaded file
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
   const handleUploadImage = () => {
-    console.log("Upload image selected");
-    setShowOptions(false);
-  };
-
-  const handleTakePicture = () => {
-    console.log("Take picture selected");
-    setShowOptions(false);
+    setShowModal(true); // Open the upload modal
+    setShowOptions(false); // Close the options menu
   };
 
   const handleManualEntry = () => {
     router.push(`/create/`);
     setShowOptions(false);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (selectedFile) {
+      uploadImageToS3(selectedFile);
+      setShowModal(false); // Close the modal after upload
+      alert("File uploaded successfully!");
+    } else {
+      alert("Please select a file to upload.");
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   useEffect(() => {
@@ -33,7 +57,7 @@ export default function Home() {
         buttonRef.current &&
         !buttonRef.current.contains(event.target as Node)
       ) {
-        setShowOptions(false);
+        setShowOptions(false); // Close options menu when clicking outside
       }
     };
 
@@ -77,15 +101,45 @@ export default function Home() {
             >
               Upload Manually
             </button>
-            <button
-              onClick={handleTakePicture}
-              className="w-full rounded-b-2xl px-5 py-3 text-center font-medium cursor-pointer"
-            >
-              Take Picture
-            </button>
           </div>
         )}
       </div>
+
+      {showModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          onClick={handleCloseModal}
+        >
+          <div
+            className="rounded-3xl p-6 w-96 border-2"
+            onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside
+          >
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Upload Receipt Image
+            </h2>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full mb-4 px-3 py-2 border rounded-lg"
+            />
+            <div className="flex justify-between">
+              <button
+                onClick={handleSubmit}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold"
+              >
+                Upload
+              </button>
+              <button
+                onClick={handleCloseModal}
+                className="px-6 py-2 bg-gray-600 text-white rounded-lg font-semibold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
