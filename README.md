@@ -8,17 +8,16 @@
 
 ### Receipt Uploading
 - Upload receipts manually or with a photo
-- OCR parsing via AWS Textract to extract items
+- OCR parsing via [insert here]
 - Editable item list before confirmation
 
 ### Split Options
 - Manual split: co-payers select items (supporting shared items)
-- Tax options: evenly, proportionally, or none
+- Tax options: evenly or proportionally
 
 ### Main Payer Workflow
 - Upload and confirm receipt
 - Choose tax handling split method
-- Enter preferred payment method (e.g., Venmo handle)
 - Share receipt link with co-payers (no login or group required)
 - View submissions and mark co-payers as paid
 - Archive past receipts (optional)
@@ -49,7 +48,6 @@
 
 ### AWS Services
 - **S3** – Receipt image uploads
-- **Textract** – OCR receipt parsing
 - **DynamoDB** – Store receipt, item, and co-payer data
 - **SNS** – SMS notifications
 - **Lambda** – Scheduled reminders and backend logic (as needed)
