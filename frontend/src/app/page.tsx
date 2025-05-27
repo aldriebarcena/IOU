@@ -3,19 +3,52 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { uploadImageToS3 } from "@/lib/s3"; // Import the utility function for S3 upload (no Textract)
+import { uploadImageToS3 } from "@/lib/s3"; // The function that uploads to S3
+import Tesseract from "tesseract.js"; // Import Tesseract.js for OCR
+
+// Function to extract text using Tesseract.js
+const extractTextFromImage = async (imageUrl: string) => {
+  return new Promise<string>((resolve, reject) => {
+    Tesseract.recognize(imageUrl, "eng", { logger: (m) => console.log(m) })
+      .then(({ data: { text } }) => resolve(text))
+      .catch(reject);
+  });
+};
+
+// Function to process extracted text using GPT-4 (LLM)
+const parseTextWithLLM = async (text: string) => {
+  try {
+    const response = await fetch("/api/parse-receipt", {
+      method: "POST",
+      body: JSON.stringify({ text }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      return data.parsedData; // Return parsed data from LLM
+    } else {
+      console.error("Failed to parse text:", data);
+      alert("Failed to parse text from the receipt.");
+    }
+  } catch (error) {
+    console.error("Error parsing text with LLM:", error);
+    alert("Error processing the text parsing.");
+  }
+};
 
 export default function Home() {
   const [showOptions, setShowOptions] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false); // Modal state for upload form
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // To store the uploaded file
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [extractedData, setExtractedData] = useState<string>(""); // Store extracted text
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
   const handleUploadImage = () => {
-    setShowModal(true); // Open the upload modal
-    setShowOptions(false); // Close the options menu
+    setShowModal(true);
+    setShowOptions(false);
   };
 
   const handleManualEntry = () => {
@@ -33,18 +66,30 @@ export default function Home() {
     if (selectedFile) {
       try {
         // Step 1: Upload the file to S3
-        const uploadedFileUrl = await uploadImageToS3(selectedFile); // Get the URL of the uploaded file
+        const uploadedFileUrl = await uploadImageToS3(selectedFile);
 
         if (uploadedFileUrl) {
           console.log("File uploaded successfully:", uploadedFileUrl);
           alert("File processed successfully!");
 
-          // Step 2: Redirect to the /create page after successful upload
-          router.push("/create");
+          // Step 2: Extract text using Tesseract.js
+          const extractedText = await extractTextFromImage(uploadedFileUrl);
+
+          console.log("Extracted Text:", extractedText); // Log the raw text
+
+          // Step 3: Parse the extracted text with LLM (e.g., GPT-4)
+          const parsedData = await parseTextWithLLM(extractedText);
+          console.log("Parsed Data:", parsedData);
+
+          // Step 4: Display the parsed data or save it
+          setExtractedData(parsedData); // Optionally display the parsed data
+
+          // Redirect to another page if needed
+          // router.push("/create");
         }
       } catch (error) {
-        console.error("Error during file upload:", error);
-        alert("An error occurred during the file upload.");
+        console.error("Error during file upload or text extraction:", error);
+        alert("An error occurred during the file upload or text extraction.");
       }
     } else {
       alert("Please select a file to upload.");
@@ -63,7 +108,7 @@ export default function Home() {
         buttonRef.current &&
         !buttonRef.current.contains(event.target as Node)
       ) {
-        setShowOptions(false); // Close options menu when clicking outside
+        setShowOptions(false);
       }
     };
 
@@ -144,6 +189,20 @@ export default function Home() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Optionally, you can display the extracted and parsed data */}
+      {extractedData && (
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">Parsed Receipt Data:</h2>
+          <textarea
+            value={extractedData}
+            onChange={(e) => setExtractedData(e.target.value)}
+            rows={10}
+            cols={50}
+            className="border rounded-lg p-2 w-full"
+          />
         </div>
       )}
     </div>
