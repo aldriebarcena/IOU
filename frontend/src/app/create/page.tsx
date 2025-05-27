@@ -1,3 +1,5 @@
+// where main payer edits receipt
+
 "use client";
 import { useState } from "react";
 import Header from "@/components/Header";

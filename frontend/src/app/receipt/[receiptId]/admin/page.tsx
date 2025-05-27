@@ -1,3 +1,5 @@
+// main payer chooses items then generates link
+
 "use client";
 import { useState } from "react";
 import Header from "@/components/Header";

@@ -1,3 +1,5 @@
+// copayers confirm that they paid
+
 "use client";
 import { useState } from "react";
 import Header from "@/components/Header";
