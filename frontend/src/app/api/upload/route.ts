@@ -45,7 +45,10 @@ export async function POST(req: Request) {
     const command = new PutObjectCommand(params);
     await s3.send(command); // Upload the file
 
-    return NextResponse.json({ message: "File uploaded successfully" });
+    return NextResponse.json({
+      message: "File uploaded successfully",
+      url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/receipts/${file.name}`,
+    });
   } catch (err: unknown) {
     // Use type guard to ensure err is an instance of Error
     if (err instanceof Error) {

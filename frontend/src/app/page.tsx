@@ -4,6 +4,33 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaCloudUploadAlt } from "react-icons/fa";
 
+// Function to upload the image to S3
+const uploadImageToS3 = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const responseData = await response.json();
+
+    if (response.ok) {
+      console.log("File uploaded successfully:", responseData);
+      return responseData.url; // return the URL of the uploaded file
+    } else {
+      // Log the error message returned from the backend
+      console.error("Failed to upload file:", responseData);
+      alert(`Failed to upload file: ${responseData.message}`);
+    }
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    alert("An error occurred while uploading.");
+  }
+};
+
 export default function Home() {
   const [showOptions, setShowOptions] = useState(false);
   const [showModal, setShowModal] = useState(false); // Modal state for upload form
@@ -11,41 +38,6 @@ export default function Home() {
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
-
-  const uploadImageToS3 = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const responseData = await response.json();
-
-      if (response.ok) {
-        console.log("File uploaded successfully:", responseData);
-        alert("File uploaded successfully!");
-      } else {
-        // Log the error message returned from the backend
-        console.error("Failed to upload file:", responseData);
-        alert(`Failed to upload file: ${responseData.message}`);
-      }
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      alert("An error occurred while uploading.");
-    }
-  };
-
-  const handleSubmit = () => {
-    if (selectedFile) {
-      uploadImageToS3(selectedFile); // Upload the file to S3 via the backend
-      setShowModal(false); // Close the modal after upload
-    } else {
-      alert("Please select a file to upload.");
-    }
-  };
 
   const handleUploadImage = () => {
     setShowModal(true); // Open the upload modal
@@ -60,6 +52,49 @@ export default function Home() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (selectedFile) {
+      try {
+        // Step 1: Upload the file to S3
+        const uploadedFileUrl = await uploadImageToS3(selectedFile); // Get the URL of the uploaded file
+        console.log(uploadedFileUrl);
+
+        if (uploadedFileUrl) {
+          // Step 2: Call AWS Textract to extract text from the uploaded file
+          console.log(process.env.NEXT_PUBLIC_AWS_BUCKET_NAME);
+          console.log(`receipts/${selectedFile.name}`);
+          const textractResponse = await fetch("/api/extract-text", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              s3Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME, // Bucket name
+              s3Key: `receipts/${selectedFile.name}`, // File path
+            }),
+          });
+
+          // Log the response for debugging
+          const textractData = await textractResponse.json();
+          if (textractResponse.ok) {
+            console.log("Extracted Text from Textract:", textractData.text);
+            alert("File processed successfully!");
+          } else {
+            console.error("Textract failed:", textractData);
+            alert(
+              `Error extracting text: ${textractData.error || "Unknown error"}`
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Error during file upload or Textract:", error);
+        alert("An error occurred during the file upload or text extraction.");
+      }
+    } else {
+      alert("Please select a file to upload.");
     }
   };
 
