@@ -27,7 +27,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="hidden md:flex fixed inset-0 z-50 items-center justify-center px-6 text-center">
+          <p className="text-xl font-semibold text-white">
+            📱 This app is only available on mobile devices. Please use a
+            smaller screen.
+          </p>
+        </div>
+
+        <div className="block md:hidden">{children}</div>
       </body>
     </html>
   );
