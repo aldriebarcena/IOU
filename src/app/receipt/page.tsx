@@ -79,7 +79,7 @@ export default function ReceiptPage() {
     );
   };
 
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     const receiptId = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
@@ -99,7 +99,13 @@ export default function ReceiptPage() {
       currentCopayerCount: 0, // initially 0
     };
 
-    console.log("🧾 Receipt Payload:", receipt);
+    await fetch("/api/save-receipt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(receipt),
+    });
+
+    console.log("✅ Saved to DynamoDB:", receipt);
   };
 
   return (

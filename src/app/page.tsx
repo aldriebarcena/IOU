@@ -47,7 +47,7 @@ export default function Home() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("/api/parseReceipt", {
+      const res = await fetch("/api/parse-receipt", {
         method: "POST",
         body: formData,
       });
