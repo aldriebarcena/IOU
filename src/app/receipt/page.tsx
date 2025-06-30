@@ -26,6 +26,7 @@ export default function ReceiptPage() {
   const [coPayerCount, setCoPayerCount] = useState<number>(0);
   const [tax, setTax] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const raw = searchParams.get("data");
@@ -79,24 +80,27 @@ export default function ReceiptPage() {
     );
   };
 
+  const [showModal, setShowModal] = useState(false);
+  const [receiptId, setReceiptId] = useState<string>("");
+
   const handleSubmit = async (): Promise<void> => {
-    const receiptId = crypto.randomUUID();
+    const newReceiptId = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
     const receipt = {
-      receiptId,
+      receiptId: newReceiptId,
       createdAt,
       mainPayer: {
-        id: "main", // could be replaced with a generated or hashed ID
+        id: "main",
         name: payerName,
         phone: payerPhone,
       },
-      copayers: [], // will be filled later on confirmation
+      copayers: [],
       items,
       tax,
       total,
       expectedCopayerCount: coPayerCount,
-      currentCopayerCount: 0, // initially 0
+      currentCopayerCount: 0,
     };
 
     await fetch("/api/save-receipt", {
@@ -106,7 +110,11 @@ export default function ReceiptPage() {
     });
 
     console.log("✅ Saved to DynamoDB:", receipt);
+    setReceiptId(newReceiptId);
+    setShowModal(true);
   };
+
+  const shareableLink = `${window.location.origin}/copayer/${receiptId}`;
 
   return (
     <div className="min-h-screen px-4 py-8">
@@ -195,6 +203,32 @@ export default function ReceiptPage() {
       >
         Submit
       </button>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-xl p-6 w-full max-w-sm shadow-xl text-center">
+            <h2 className="text-lg font-semibold mb-2">
+              Share this link with your friends
+            </h2>
+            <p className="text-blue-600 break-words mb-4">{shareableLink}</p>
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded w-full mb-2"
+              onClick={() => {
+                navigator.clipboard.writeText(shareableLink);
+                setCopied(true);
+              }}
+            >
+              Copy Link
+            </button>
+            {copied && (
+              <p className="text-green-700 text-sm mt-2">
+                Link copied! Once you send this to your friends, you may exit
+                this page.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
