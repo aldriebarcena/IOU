@@ -1,5 +1,9 @@
+// TO DO: POPULATE EDITABLE TABLE FROM PARSED JSON
+// TO DO: ON SUBMIT, TAKE MODIFIED DATA, SAVE TO DATABASE
+
 "use client";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type ReceiptItem = {
   name: string;
@@ -18,6 +22,7 @@ type ParsedReceipt = {
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let file = e.target.files?.[0];
@@ -48,6 +53,7 @@ export default function Home() {
       });
 
       const data: ParsedReceipt = await res.json();
+      router.push(`/receipt?data=${encodeURIComponent(JSON.stringify(data))}`);
       console.log("Parsed Receipt:", data);
     } catch (err) {
       console.error("Upload error:", err);
