@@ -29,8 +29,7 @@ export default function RootLayout({
       >
         <div className="hidden md:flex fixed inset-0 z-50 items-center justify-center px-6 text-center">
           <p className="text-xl font-semibold text-white">
-            📱 This app is only available on mobile devices. Please use a
-            smaller screen.
+            📱 Please use a mobile device for the best experience.
           </p>
         </div>
 
