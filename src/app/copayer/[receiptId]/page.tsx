@@ -160,20 +160,66 @@ export default function CoPayerPage() {
         ),
       };
 
+      // 1. Group items by copayerId
+      const totals: Record<string, number> = {};
+      const itemBreakdown: Record<string, string[]> = {};
+
       json.updatedReceipt.items.forEach((item: ReceiptItem) => {
         const splitAmount = item.price / item.copayerIds.length;
-        console.log(
-          `Item: ${item.name} | $${item.price.toFixed(2)} split among:`
-        );
         item.copayerIds.forEach((id) => {
-          const payer = payerMap[id];
-          if (payer) {
-            console.log(
-              `- ${payer.name} (${payer.phone}): $${splitAmount.toFixed(2)}`
-            );
-          }
+          if (!totals[id]) totals[id] = 0;
+          if (!itemBreakdown[id]) itemBreakdown[id] = [];
+          totals[id] += splitAmount;
+          itemBreakdown[id].push(item.name);
         });
       });
+
+      // 2. Distribute tax evenly among all people who selected at least one item
+      const involvedIds = Object.keys(totals);
+      const taxSplit = json.updatedReceipt.tax / involvedIds.length;
+      involvedIds.forEach((id) => (totals[id] += taxSplit));
+
+      // 3. Compose logs and messages
+      let mainSummary = `Hello ${json.updatedReceipt.mainPayer.name}! Welcome to IOU!\n\nEveryone has chosen their items:\n`;
+
+      involvedIds.forEach((id) => {
+        const payer = payerMap[id];
+        mainSummary += `\n${payer.name} - ${itemBreakdown[id].join(", ")}`;
+      });
+
+      mainSummary += `\n\n`;
+
+      involvedIds.forEach((id) => {
+        const payer = payerMap[id];
+        mainSummary += `${payer.name} owes: $${totals[id].toFixed(2)}\n`;
+      });
+
+      mainSummary += `
+To confirm a payer: [name] - confirm
+To remind a payer: [name] - remind
+To close receipt: close
+To cancel a receipt: cancel
+
+These messages are not case sensitive.
+`;
+
+      console.log("\n📨 Main Payer Message:\n", mainSummary);
+
+      // 4. Compose copayer messages
+      involvedIds
+        .filter((id) => id !== json.updatedReceipt.mainPayer.id)
+        .forEach((id) => {
+          const payer = payerMap[id];
+          const msg = `Hello ${payer.name}! Welcome to IOU!
+
+Everyone has chosen their items.
+
+You selected these items: ${itemBreakdown[id].join(", ")}.
+
+You owe ${json.updatedReceipt.mainPayer.name} $${totals[id].toFixed(2)}.`;
+
+          console.log(`\n📨 Copayer Message (${payer.name}):\n`, msg);
+        });
     }
 
     setConfirmModalOpen(false);
