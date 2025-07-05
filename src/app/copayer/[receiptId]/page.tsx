@@ -147,10 +147,8 @@ export default function CoPayerPage() {
     const json = await saveRes.json();
     console.log("✅ Updated Receipt in DynamoDB:", json.updatedReceipt);
 
-    // If all copayers have responded, calculate and log splits
-    const current = json.updatedReceipt.currentCopayerCount;
-    const expected = json.updatedReceipt.expectedCopayerCount;
-    if (current === expected) {
+    const { currentCopayerCount, expectedCopayerCount } = json.updatedReceipt;
+    if (currentCopayerCount === expectedCopayerCount) {
       console.log("🎉 All copayers have submitted!");
 
       const payerMap: Record<string, Copayer> = {
@@ -160,7 +158,6 @@ export default function CoPayerPage() {
         ),
       };
 
-      // 1. Group items by copayerId
       const totals: Record<string, number> = {};
       const itemBreakdown: Record<string, string[]> = {};
 
@@ -174,12 +171,10 @@ export default function CoPayerPage() {
         });
       });
 
-      // 2. Distribute tax evenly among all people who selected at least one item
       const involvedIds = Object.keys(totals);
       const taxSplit = json.updatedReceipt.tax / involvedIds.length;
       involvedIds.forEach((id) => (totals[id] += taxSplit));
 
-      // 3. Compose logs and messages
       let mainSummary = `Hello ${json.updatedReceipt.mainPayer.name}! Welcome to IOU!\n\nEveryone has chosen their items:\n`;
 
       involvedIds.forEach((id) => {
@@ -194,32 +189,40 @@ export default function CoPayerPage() {
         mainSummary += `${payer.name} owes: $${totals[id].toFixed(2)}\n`;
       });
 
-      mainSummary += `
-To confirm a payer: [name] - confirm
-To remind a payer: [name] - remind
-To close receipt: close
-To cancel a receipt: cancel
+      mainSummary += `\nTo confirm a payer: [name] - confirm\nTo remind a payer: [name] - remind\nTo close receipt: close\nTo cancel a receipt: cancel\n\nThese messages are not case sensitive.`;
 
-These messages are not case sensitive.
-`;
+      await fetch("/api/send-twilio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: json.updatedReceipt.mainPayer.phone,
+          message: mainSummary,
+        }),
+      });
 
-      console.log("\n📨 Main Payer Message:\n", mainSummary);
+      await Promise.all(
+        involvedIds
+          .filter((id) => id !== json.updatedReceipt.mainPayer.id)
+          .map((id) => {
+            const payer = payerMap[id];
+            const msg = `Hello ${
+              payer.name
+            }! Welcome to IOU!\n\nEveryone has chosen their items.\n\nYou selected these items: ${itemBreakdown[
+              id
+            ].join(", ")}.\n\nYou owe ${
+              json.updatedReceipt.mainPayer.name
+            } $${totals[id].toFixed(2)}.`;
 
-      // 4. Compose copayer messages
-      involvedIds
-        .filter((id) => id !== json.updatedReceipt.mainPayer.id)
-        .forEach((id) => {
-          const payer = payerMap[id];
-          const msg = `Hello ${payer.name}! Welcome to IOU!
-
-Everyone has chosen their items.
-
-You selected these items: ${itemBreakdown[id].join(", ")}.
-
-You owe ${json.updatedReceipt.mainPayer.name} $${totals[id].toFixed(2)}.`;
-
-          console.log(`\n📨 Copayer Message (${payer.name}):\n`, msg);
-        });
+            return fetch("/api/send-twilio", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                phone: payer.phone,
+                message: msg,
+              }),
+            });
+          })
+      );
     }
 
     setConfirmModalOpen(false);

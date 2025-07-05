@@ -1,10 +1,6 @@
-// TO DO: SET UP SMS
-// TO DO:   WHEN EVERYONE HAS SUBMITTED, SEND THEIR TOTALS OUT
 // TO DO:   ADD MAIN PAYER CAPABILITIES
 // TO DO:     "[name] - confirm"
 // TO DO:     "receipt complete"
-
-
 
 "use client";
 import { useRef, useState } from "react";
