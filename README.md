@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IOU — Receipt Splitting Made Easy
+
+IOU is a full-stack web app that lets a group split a bill by just uploading a receipt. The main payer uploads and edits the receipt, invites co-payers, and once everyone has picked their items, each person gets a text with how much they owe — tax included.
+
+## Features
+
+- **Upload Receipts**: Image uploads supported (JPEG, PNG, HEIC)
+- **Auto Parsing**: Uses AWS Textract + OpenAI to extract and clean receipt items
+- **Main Payer Control**: Edit items and select which ones you're paying for
+- **Co-Payer Flow**: Friends choose items, enter their name and phone
+- **SMS Totals**: Everyone gets a text with their total when all co-payers are done
+
+## Tech Stack
+
+- **Frontend**: Next.js, React, TailwindCSS
+- **Backend**: Next.js API Routes
+- **OCR**: AWS Textract
+- **AI Cleanup**: OpenAI (function calling)
+- **Database**: AWS DynamoDB
+- **Messaging**: Twilio SMS
+
+## How It Works
+
+1. Main payer uploads a receipt
+2. Textract extracts text → OpenAI cleans and formats it
+3. Main payer reviews and submits
+4. Co-payers pick their items via shared link
+5. Once all co-payers submit, everyone gets a text with what they owe
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- AWS account with Textract & DynamoDB
+- OpenAI API key
+- Twilio account with verified number
+
+### Setup
 
 ```bash
+git clone https://github.com/aldriebarcena/IOU.git
+cd IOU
+cp .env.example .env.local  # Fill in your API keys
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
